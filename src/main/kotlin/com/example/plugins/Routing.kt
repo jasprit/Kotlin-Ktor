@@ -1,5 +1,6 @@
 package com.example.plugins
 
+import com.example.routes.userRoutes
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
@@ -17,4 +18,7 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
     }
+	
+	// Add our Routes here..
+	userRoutes()
 }

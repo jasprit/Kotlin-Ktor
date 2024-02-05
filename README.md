@@ -6,5 +6,6 @@ Simple Ktor REST API project with MongoDB integration. Make to showcase a simple
 ## Features
 
 - Routing
-- Exception Handling
+- Content Navigation (https://ktor.io/docs/serialization-client.html)
+- DoubleReceive [Receive multiples request at once] (https://ktor.io/docs/double-receive.html).
 
