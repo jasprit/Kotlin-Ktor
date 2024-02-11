@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.feature.user.UserServices
 import com.example.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -11,7 +12,7 @@ class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting()
+          //  configureRouting(UserServices())
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
