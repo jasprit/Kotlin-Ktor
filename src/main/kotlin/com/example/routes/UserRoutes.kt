@@ -89,7 +89,7 @@ fun Application.userRoutes(
                     status = HttpStatusCode.OK,
                     message = AuthResponse(
                         token = token,
-                        name = ""
+                        name = user.name
                     )
                 )
             }
