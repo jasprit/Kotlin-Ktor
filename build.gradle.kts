@@ -1,8 +1,8 @@
-
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 val kmongo_version: String by project
+val koin_version:String by project
 
 
 plugins {
@@ -34,18 +34,21 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-	implementation("io.ktor:ktor-server-double-receive:$ktor_version")
-	implementation("io.ktor:ktor-server-request-validation:$ktor_version")
-	
-	implementation("org.litote.kmongo:kmongo:$kmongo_version")
-	implementation("org.litote.kmongo:kmongo-coroutine:$kmongo_version")
-	
-	implementation("io.ktor:ktor-server-auth-jvm:$ktor_version")
-	implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktor_version")
-	
-	testImplementation("io.ktor:ktor-server-tests-jvm")
+    implementation("io.ktor:ktor-server-double-receive:$ktor_version")
+    implementation("io.ktor:ktor-server-request-validation:$ktor_version")
+
+    implementation("org.litote.kmongo:kmongo:$kmongo_version")
+    implementation("org.litote.kmongo:kmongo-coroutine:$kmongo_version")
+
+    implementation("io.ktor:ktor-server-auth-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:$ktor_version")
+
+    testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-	
-	implementation ("commons-codec:commons-codec:1.11")
-	
+
+    implementation("commons-codec:commons-codec:1.11")
+    implementation("org.apache.commons:commons-email:1.6.0")
+
+    implementation("io.insert-koin:koin-ktor:$koin_version")
+    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
 }

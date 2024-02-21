@@ -2,12 +2,13 @@ package com.example.routes
 
 
 import com.example.feature.user.UserServices
-import com.example.feature.user.User
 import com.example.feature.user.auth.AuthRequest
 import com.example.feature.user.auth.AuthResponse
 import com.example.feature.user.auth.toUser
 import com.example.security.HashingService
+import com.example.security.SHA256HashingService
 import com.example.security.SaltedHash
+import com.example.token.JwtTokenService
 import com.example.token.TokenClaim
 import com.example.token.TokenConfig
 import com.example.token.TokenService
@@ -17,14 +18,23 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.apache.commons.codec.digest.DigestUtils
+import org.koin.core.parameter.parametersOf
+import org.koin.ktor.ext.inject
 
 
 fun Application.userRoutes(
-    userServices: UserServices,
-    hashingService: HashingService,
-    tokenService: TokenService,
-    tokenConfig: TokenConfig
+    userServices: UserServices
 ) {
+
+    val issuer = System.getenv("jwt.issuer")
+    val audience = System.getenv("jwt.audience")
+    val expiresIn = 365L * 1000L * 60L * 60L * 24
+    val secret = System.getenv("JWT_SECRET")
+
+    val hashingService: HashingService by inject()
+    val tokenService: TokenService by inject()
+    val tokenConfig: TokenConfig by inject { parametersOf(issuer, audience, expiresIn, secret) }
+
 
     routing {
 

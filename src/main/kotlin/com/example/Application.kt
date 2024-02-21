@@ -20,6 +20,8 @@ fun main() {
 @Suppress("unused")
 //  application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
+
+
     val mongoUsrName = System.getenv("MONGO_USR_NAME")
     val mongoPw = System.getenv("MONGO_PWD")
     val mongoDbName = System.getenv("MONGO_DB_NAME")
@@ -31,19 +33,13 @@ fun Application.module() {
 
     val userServices = UserServicesImpl(db)
 
-    val tokenService = JwtTokenService()
-    val tokenConfig = TokenConfig(
-        issuer = System.getenv("jwt.issuer"),
-        audience = System.getenv("jwt.audience"),
-        expiresIn = 365L * 1000L * 60L * 60L * 24L,
-        secret = System.getenv("JWT_SECRET")
-    )
-    val hashingService = SHA256HashingService()
+
 
     configureSerialization()
     configureHTTP()
-    configureRouting(userServices, hashingService,tokenService,tokenConfig)
+    configureRouting(userServices)
     configureDoubleReceive()
     configureRequestValidation()
+    configureKoin()
 }
 

@@ -12,10 +12,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(
-    userServices: UserServicesImpl,
-    hashingService: HashingService,
-    tokenService: JwtTokenService,
-    tokenConfig: TokenConfig
+    userServices: UserServicesImpl
 ) {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
@@ -29,5 +26,5 @@ fun Application.configureRouting(
     }
 
     // Add our Routes here..
-    userRoutes(userServices, hashingService, tokenService, tokenConfig)
+    userRoutes(userServices)
 }
