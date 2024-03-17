@@ -5,104 +5,103 @@ import com.example.feature.user.UserServices
 import com.example.feature.user.auth.AuthRequest
 import com.example.feature.user.auth.AuthResponse
 import com.example.feature.user.auth.toUser
-import com.example.security.HashingService
-import com.example.security.SHA256HashingService
-import com.example.security.SaltedHash
-import com.example.token.JwtTokenService
-import com.example.token.TokenClaim
-import com.example.token.TokenConfig
-import com.example.token.TokenService
+import com.example.util.security.HashingService
+import com.example.util.security.SaltedHash
+import com.example.util.token.TokenClaim
+import com.example.util.token.TokenConfig
+import com.example.util.token.TokenService
+import com.example.util.ApiError
+import com.example.util.ErrorResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.apache.commons.codec.digest.DigestUtils
-import org.koin.core.parameter.parametersOf
-import org.koin.ktor.ext.inject
+import kotlinx.serialization.SerializationException
 
 
 fun Application.userRoutes(
-    userServices: UserServices
+    userServices: UserServices,
+    hashingService: HashingService,
+    tokenService: TokenService
 ) {
 
-    val issuer = System.getenv("jwt.issuer")
-    val audience = System.getenv("jwt.audience")
-    val expiresIn = 365L * 1000L * 60L * 60L * 24
-    val secret = System.getenv("JWT_SECRET")
+    // Retrieve JWT configuration from environment variables
+    val issuer = System.getenv("JWT_ISSUER") ?: error("JWT issuer is not configured")
+    val audience = System.getenv("JWT_AUDIENCE") ?: error("JWT audience is not configured")
+    val expiresIn = 365L * 24 * 60 * 60 * 1000 // 365 days
+    val secret = System.getenv("JWT_SECRET") ?: error("JWT secret is not configured")
 
-    val hashingService: HashingService by inject()
-    val tokenService: TokenService by inject()
-    val tokenConfig: TokenConfig by inject { parametersOf(issuer, audience, expiresIn, secret) }
-
+    // Initialize token configuration
+    val tokenConfig = TokenConfig(issuer, audience, expiresIn, secret)
 
     routing {
-
         route("/users") {
+            post("signup") {
+                try {
+                    val request = call.receive<AuthRequest>()
 
-            post("signup") { request ->
-                val requestBody = call.receive<AuthRequest>()
+                    //Check if user already exists.
+                    if (userServices.findUserByEmail(request.email) != null) {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(101, "User already there")
+                        )
+                        return@post
+                    }
 
-                //Check if user is exit before.
-                val isUserExits = userServices.findUserByEmail(requestBody.email)
+                    //Generate Salted hash for user.
+                    val saltedHash = hashingService.generateSaltedHash(request.password)
+                    val user =
+                        request.toUser().copy(password = saltedHash.hash, salt = saltedHash.salt)
 
-                if (isUserExits != null) {
-                    call.respond(HttpStatusCode.BadRequest, "user exists")
-                    return@post
+                    //Create user.
+                    if (userServices.createUser(user))
+                        call.respond(HttpStatusCode.OK)
+                    else
+                        throw ApiError.ServerError()
+
+                } catch (e: SerializationException) {
+                    throw ApiError.ParsingError()
+                } catch (t: Throwable) {
+                    throw ApiError.BadRequest("Failed to sign up: ${t.message}")
                 }
-                val saltedHash = hashingService.generateSaltedHash(requestBody.password)
-                val user =
-                    requestBody.toUser().copy(password = saltedHash.hash, salt = saltedHash.salt)
-
-                if (userServices.createUser(user))
-                    call.respond(HttpStatusCode.OK)
-                else
-                    call.respond(HttpStatusCode.BadRequest, requestBody)
+                return@post
             }
 
-            post("login") { request ->
-                val requestBody = call.receive<AuthRequest>()
+            post("login") {
+                try {
+                    val request = call.receive<AuthRequest>()
 
-//                val request = call.receiveOrNull<AuthRequest>() ?: kotlin.run {
-//                    call.respond(HttpStatusCode.BadRequest)
-//                    return@post
-//                }
+                    //Find user by email
+                    val user = userServices.findUserByEmail(request.email)
+                    if (user == null || !hashingService.verify(
+                            request.password,
+                            SaltedHash(user.password, user.salt ?: "")
+                        )
+                    ) {
+                        call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
+                        return@post
+                    }
 
-                val user = userServices.findUserByEmail(requestBody.email)
-                if (user == null) {
-                    call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
-                    return@post
+                    //Generate JWT Token
+                    val token = tokenService.generate(
+                        config = tokenConfig,
+                        TokenClaim(
+                            name = "userId",
+                            value = user.id.toString()
+                        )
+                    )
+
+                    call.respond(HttpStatusCode.OK, AuthResponse(token = token, name = user.name))
+                } catch (e: SerializationException) {
+                    throw ApiError.ParsingError()
+                } catch (t: Throwable) {
+                    throw ApiError.BadRequest("Failed to log in: ${t.message}")
                 }
-
-                val isValidPassword = hashingService.verify(
-                    value = requestBody.password,
-                    saltedHash = SaltedHash(
-                        hash = user.password,
-                        salt = user.salt ?: ""
-                    )
-                )
-                if (!isValidPassword) {
-                    println("Entered hash: ${DigestUtils.sha256Hex("${user.salt}${user.password}")}, Hashed PW: ${user.password}")
-                    call.respond(HttpStatusCode.Conflict, "Incorrect username or password")
-                    return@post
-                }
-
-                val token = tokenService.generate(
-                    config = tokenConfig,
-                    TokenClaim(
-                        name = "userId",
-                        value = user.id.toString()
-                    )
-                )
-
-                call.respond(
-                    status = HttpStatusCode.OK,
-                    message = AuthResponse(
-                        token = token,
-                        name = user.name
-                    )
-                )
             }
         }
     }
 }
+
+

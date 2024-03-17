@@ -2,9 +2,7 @@ package com.example
 
 import com.example.feature.user.UserServicesImpl
 import com.example.plugins.*
-import com.example.security.SHA256HashingService
-import com.example.token.JwtTokenService
-import com.example.token.TokenConfig
+import configureApiExceptions
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -22,24 +20,13 @@ fun main() {
 fun Application.module() {
 
 
-    val mongoUsrName = System.getenv("MONGO_USR_NAME")
-    val mongoPw = System.getenv("MONGO_PWD")
-    val mongoDbName = System.getenv("MONGO_DB_NAME")
-    val db = KMongo.createClient(
-        connectionString = "mongodb+srv://$mongoUsrName:$mongoPw@cluster0.n3lt88l.mongodb.net/$mongoDbName?retryWrites=true&w=majority"
-
-    ).coroutine
-        .getDatabase(mongoDbName)
-
-    val userServices = UserServicesImpl(db)
-
-
-
     configureSerialization()
     configureHTTP()
-    configureRouting(userServices)
-    configureDoubleReceive()
-    configureRequestValidation()
     configureKoin()
+    configureRouting()
+    configureApiExceptions()
+    configureDoubleReceive()
+    //   configureRequestValidation()
+
 }
 

@@ -1,4 +1,4 @@
-package com.example.token
+package com.example.util.token
 
 data class TokenConfig(
     val issuer: String,

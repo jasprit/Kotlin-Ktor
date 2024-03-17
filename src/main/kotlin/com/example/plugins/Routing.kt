@@ -1,24 +1,24 @@
 package com.example.plugins
 
-import com.example.feature.user.UserServicesImpl
+import com.example.feature.user.UserServices
 import com.example.routes.userRoutes
-import com.example.security.HashingService
-import com.example.token.JwtTokenService
-import com.example.token.TokenConfig
-import io.ktor.http.*
+import com.example.util.security.HashingService
+import com.example.util.token.TokenService
 import io.ktor.server.application.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
+
+import org.koin.ktor.ext.inject
 
 fun Application.configureRouting(
-    userServices: UserServicesImpl
+
 ) {
-    install(StatusPages) {
-        exception<Throwable> { call, cause ->
-            call.respondText(text = "500: $cause", status = HttpStatusCode.InternalServerError)
-        }
-    }
+    // Get dependencies using Koin
+    val userServices: UserServices by inject()
+    val hashingService: HashingService by inject()
+    val tokenService: TokenService by inject()
+
     routing {
         get("/") {
             call.respondText("Hello World!")
@@ -26,5 +26,5 @@ fun Application.configureRouting(
     }
 
     // Add our Routes here..
-    userRoutes(userServices)
+    userRoutes(userServices, hashingService, tokenService)
 }
