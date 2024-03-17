@@ -1,7 +1,6 @@
 package com.example.routes
 
 
-
 import com.example.features.auth.AuthRequest
 import com.example.services.AuthService
 import io.ktor.http.HttpStatusCode

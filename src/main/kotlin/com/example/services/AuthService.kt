@@ -12,7 +12,8 @@ import kotlinx.serialization.SerializationException
 class AuthService(
     private val userRepositories: UserRepositories,
     private val hashingService: HashingService,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val emailService: EmailService
 ) {
 
     suspend fun signUp(request: AuthRequest): HttpStatusCode {
@@ -25,6 +26,10 @@ class AuthService(
             val saltedHash = hashingService.generateSaltedHash(request.password)
             val user = request.toUser().copy(password = saltedHash.hash, salt = saltedHash.salt)
             userRepositories.createUser(user)
+
+            //Send user registration confirmation here.
+            emailService.sendEmail("Welcome", "Registration Successful.", user.email)
+
             return HttpStatusCode.OK
         } catch (e: SerializationException) {
             throw ApiError.UnprocessableEntity()

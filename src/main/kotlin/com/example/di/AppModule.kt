@@ -8,6 +8,8 @@ import com.example.services.SHA256HashingService
 import com.example.services.JwtTokenService
 import com.example.services.TokenService
 import com.example.services.AuthService
+import com.example.services.EmailService
+import com.example.services.EmailServiceImpl
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.reactivestreams.KMongo
@@ -28,8 +30,10 @@ val appModule = module {
     // Provide CoroutineCollection<User> dependency
     single { get<CoroutineDatabase>().getCollection<User>("users") }
 
+    //Auth dependencies.
     single<HashingService> { SHA256HashingService() }
+    single<EmailService> { EmailServiceImpl() }
     single<TokenService> { JwtTokenService() }
     single<UserRepositories> { UserRepositoriesImpl(get()) }
-    single<AuthService> { AuthService(get(), get(), get()) }
+    single<AuthService> { AuthService(get(), get(), get(), get()) }
 }
