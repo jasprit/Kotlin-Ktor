@@ -1,13 +1,10 @@
 package com.example
 
-import com.example.feature.user.UserServicesImpl
-import com.example.plugins.*
+import com.example.config.*
 import configureApiExceptions
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.reactivestreams.KMongo
 
 
 fun main() {
@@ -19,14 +16,12 @@ fun main() {
 //  application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
 
-
     configureSerialization()
     configureHTTP()
     configureKoin()
     configureRouting()
     configureApiExceptions()
     configureDoubleReceive()
-    //   configureRequestValidation()
-
+    //configureRequestValidation()
 }
 

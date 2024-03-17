@@ -1,4 +1,4 @@
-package com.example.feature.user
+package com.example.features.auth
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id

@@ -1,6 +1,6 @@
 package com.example.util
 
-import com.example.feature.user.auth.AuthRequest
+import com.example.features.auth.AuthRequest
 import io.ktor.server.plugins.requestvalidation.RequestValidationConfig
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 

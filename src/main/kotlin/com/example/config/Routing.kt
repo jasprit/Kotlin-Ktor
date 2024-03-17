@@ -1,9 +1,7 @@
-package com.example.plugins
+package com.example.config
 
-import com.example.feature.user.UserServices
 import com.example.routes.userRoutes
-import com.example.util.security.HashingService
-import com.example.util.token.TokenService
+import com.example.services.AuthService
 import io.ktor.server.application.*
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -15,9 +13,8 @@ fun Application.configureRouting(
 
 ) {
     // Get dependencies using Koin
-    val userServices: UserServices by inject()
-    val hashingService: HashingService by inject()
-    val tokenService: TokenService by inject()
+    val authServices: AuthService by inject()
+
 
     routing {
         get("/") {
@@ -26,5 +23,5 @@ fun Application.configureRouting(
     }
 
     // Add our Routes here..
-    userRoutes(userServices, hashingService, tokenService)
+    userRoutes(authServices)
 }

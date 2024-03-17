@@ -1,12 +1,13 @@
 package com.example.di
 
-import com.example.feature.user.User
-import com.example.feature.user.UserServices
-import com.example.feature.user.UserServicesImpl
-import com.example.util.security.HashingService
-import com.example.util.security.SHA256HashingService
-import com.example.util.token.JwtTokenService
-import com.example.util.token.TokenService
+import com.example.features.auth.User
+import com.example.repositories.UserRepositories
+import com.example.repositories.UserRepositoriesImpl
+import com.example.services.HashingService
+import com.example.services.SHA256HashingService
+import com.example.services.JwtTokenService
+import com.example.services.TokenService
+import com.example.services.AuthService
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.reactivestreams.KMongo
@@ -29,5 +30,6 @@ val appModule = module {
 
     single<HashingService> { SHA256HashingService() }
     single<TokenService> { JwtTokenService() }
-    single<UserServices> { UserServicesImpl(get()) }
+    single<UserRepositories> { UserRepositoriesImpl(get()) }
+    single<AuthService> { AuthService(get(), get(), get()) }
 }

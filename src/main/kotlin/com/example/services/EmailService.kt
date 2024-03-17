@@ -1,4 +1,4 @@
-package com.example.util
+package com.example.services
 
 import org.apache.commons.mail.DefaultAuthenticator
 import org.apache.commons.mail.SimpleEmail

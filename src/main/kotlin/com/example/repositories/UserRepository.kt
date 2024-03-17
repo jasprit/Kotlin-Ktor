@@ -1,16 +1,20 @@
-package com.example.feature.user
+package com.example.repositories
 
-
+import com.example.features.auth.User
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.coroutine.CoroutineDatabase
-
-
 import org.litote.kmongo.eq
 
-class UserServicesImpl(private val users: CoroutineCollection<User>) : UserServices {
+interface UserRepositories {
+    suspend fun findUserById(userId: String): User?
+    suspend fun findUserByEmail(email: String): User?
+    suspend fun createUser(user: User): Boolean
+    suspend fun updateUser(user: User): Boolean
+}
+
+
+class UserRepositoriesImpl(private val users: CoroutineCollection<User>) : UserRepositories {
 
     override suspend fun findUserById(userId: String): User? = withContext(Dispatchers.IO) {
         return@withContext users.findOneById(userId)

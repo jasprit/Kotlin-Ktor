@@ -1,7 +1,5 @@
-package com.example.feature.user.auth
+package com.example.features.auth
 
-import com.example.feature.user.User
-import com.example.util.security.SaltedHash
 import com.example.util.validateAll
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 import kotlinx.serialization.Serializable
