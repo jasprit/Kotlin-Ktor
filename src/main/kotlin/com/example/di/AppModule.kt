@@ -10,6 +10,7 @@ import com.example.services.TokenService
 import com.example.services.AuthService
 import com.example.services.EmailService
 import com.example.services.EmailServiceImpl
+import com.example.services.TokenConfig
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.reactivestreams.KMongo
@@ -31,9 +32,17 @@ val appModule = module {
     single { get<CoroutineDatabase>().getCollection<User>("users") }
 
     //Auth dependencies.
+    single {
+        TokenConfig(
+            System.getenv("JWT_ISSUER"),
+            System.getenv("JWT_AUDIENCE"),
+            expiresIn = 365L * 24 * 60 * 60 * 1000, // 365 days
+            System.getenv("JWT_SECRET")
+        )
+    }
     single<HashingService> { SHA256HashingService() }
     single<EmailService> { EmailServiceImpl() }
     single<TokenService> { JwtTokenService() }
     single<UserRepositories> { UserRepositoriesImpl(get()) }
-    single<AuthService> { AuthService(get(), get(), get(), get()) }
+    single<AuthService> { AuthService(get(), get(), get(), get(), get()) }
 }

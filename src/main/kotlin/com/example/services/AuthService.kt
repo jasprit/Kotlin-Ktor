@@ -13,11 +13,13 @@ class AuthService(
     private val userRepositories: UserRepositories,
     private val hashingService: HashingService,
     private val tokenService: TokenService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val tokenConfig: TokenConfig
 ) {
 
     suspend fun signUp(request: AuthRequest): HttpStatusCode {
         try {
+            //Check if user already exists
             val userExists = userRepositories.findUserByEmail(request.email) != null
             if (userExists) {
                 throw ApiError.Conflict("User already exists")
@@ -28,7 +30,7 @@ class AuthService(
             userRepositories.createUser(user)
 
             //Send user registration confirmation here.
-            emailService.sendEmail("Welcome", "Registration Successful.", user.email)
+            sendRegistrationConfirmation(user.email)
 
             return HttpStatusCode.OK
         } catch (e: SerializationException) {
@@ -50,7 +52,7 @@ class AuthService(
             }
 
             val token = tokenService.generate(
-                config = getTokenConfig(),
+                config = tokenConfig,
                 TokenClaim(name = "userId", value = user.id.toString())
             )
 
@@ -62,11 +64,8 @@ class AuthService(
         }
     }
 
-    private fun getTokenConfig(): TokenConfig {
-        val issuer = System.getenv("JWT_ISSUER") ?: error("JWT issuer is not configured")
-        val audience = System.getenv("JWT_AUDIENCE") ?: error("JWT audience is not configured")
-        val expiresIn = 365L * 24 * 60 * 60 * 1000 // 365 days
-        val secret = System.getenv("JWT_SECRET") ?: error("JWT secret is not configured")
-        return TokenConfig(issuer, audience, expiresIn, secret)
+    private fun sendRegistrationConfirmation(email: String) {
+        // Send user registration confirmation email
+        emailService.sendEmail("Welcome", "Registration Successful.", email)
     }
 }
