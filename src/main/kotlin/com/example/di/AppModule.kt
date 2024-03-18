@@ -10,7 +10,7 @@ import com.example.services.TokenService
 import com.example.services.AuthService
 import com.example.services.EmailService
 import com.example.services.EmailServiceImpl
-import com.example.services.TokenConfig
+import com.example.services.JWTConfig
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.reactivestreams.KMongo
@@ -33,7 +33,7 @@ val appModule = module {
 
     //Auth dependencies.
     single {
-        TokenConfig(
+        JWTConfig(
             System.getenv("JWT_ISSUER"),
             System.getenv("JWT_AUDIENCE"),
             expiresIn = 365L * 24 * 60 * 60 * 1000, // 365 days

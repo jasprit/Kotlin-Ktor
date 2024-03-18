@@ -14,7 +14,7 @@ class AuthService(
     private val hashingService: HashingService,
     private val tokenService: TokenService,
     private val emailService: EmailService,
-    private val tokenConfig: TokenConfig
+    private val jwtConfig: JWTConfig
 ) {
 
     suspend fun signUp(request: AuthRequest): HttpStatusCode {
@@ -52,7 +52,7 @@ class AuthService(
             }
 
             val token = tokenService.generate(
-                config = tokenConfig,
+                config = jwtConfig,
                 TokenClaim(name = "userId", value = user.id.toString())
             )
 

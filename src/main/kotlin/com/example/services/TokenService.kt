@@ -5,12 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm
 import java.util.Date
 
 interface TokenService {
-    fun generate(config: TokenConfig, vararg claims: TokenClaim): String
+    fun generate(config: JWTConfig, vararg claims: TokenClaim): String
 }
 
 
 class JwtTokenService : TokenService {
-    override fun generate(config: TokenConfig, vararg claims: TokenClaim): String {
+    override fun generate(config: JWTConfig, vararg claims: TokenClaim): String {
         return JWT.create()
             .withAudience(config.audience)
             .withIssuer(config.issuer)
@@ -24,7 +24,7 @@ class JwtTokenService : TokenService {
 
 data class TokenClaim(val name: String, val value: String)
 
-data class TokenConfig(
+data class JWTConfig(
     val issuer: String,
     val audience: String,
     val expiresIn: Long,

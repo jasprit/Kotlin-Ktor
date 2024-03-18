@@ -22,6 +22,6 @@ fun Application.module() {
     configureRouting()
     configureApiExceptions()
     configureDoubleReceive()
-    //configureRequestValidation()
+    configureRequestValidation()
 }
 
