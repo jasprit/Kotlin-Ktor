@@ -1,9 +1,10 @@
 package com.example.services
 
-import com.example.features.auth.AuthRequest
+import com.example.features.auth.SignUpRequest
 import com.example.repositories.UserRepositories
 import io.ktor.http.HttpStatusCode
 import com.example.features.auth.AuthResponse
+import com.example.features.auth.LoginRequest
 import com.example.features.auth.toUser
 import com.example.util.ApiError
 import kotlinx.serialization.SerializationException
@@ -17,7 +18,7 @@ class AuthService(
     private val jwtConfig: JWTConfig
 ) {
 
-    suspend fun signUp(request: AuthRequest): HttpStatusCode {
+    suspend fun signUp(request: SignUpRequest): HttpStatusCode {
         try {
             //Check if user already exists
             val userExists = userRepositories.findUserByEmail(request.email) != null
@@ -40,7 +41,7 @@ class AuthService(
         }
     }
 
-    suspend fun login(request: AuthRequest): AuthResponse {
+    suspend fun login(request: LoginRequest): AuthResponse {
         try {
             val user = userRepositories.findUserByEmail(request.email)
             if (user == null || !hashingService.verify(

@@ -1,11 +1,11 @@
 package com.example.util
 
-import com.example.features.auth.AuthRequest
+import com.example.features.auth.SignUpRequest
 import io.ktor.server.plugins.requestvalidation.RequestValidationConfig
 import io.ktor.server.plugins.requestvalidation.ValidationResult
 
 fun RequestValidationConfig.authValidation() {
-    validate<AuthRequest> { request ->
+    validate<SignUpRequest> { request ->
         validateObject(request, listOf({ request.name.isNotBlank() } to "Model must not be empty"))
     }
 }
